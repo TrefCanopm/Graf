@@ -46,6 +46,8 @@ Graf<T>::Graf()
 template<class T>
 Graf<T>::~Graf()
 {
+	Title.clear();
+	Matrix.clear();
 }
 
 template<class T>
@@ -229,7 +231,7 @@ void Graf<T>::InsertEdge()
 template<class T>
 void Graf<T>::DelNode()
 {
-	bool Fstr = 1, Fstol = 1, Ftit = 1;
+	bool Fstr = 1;
 	string str;
 	int n;
 	cout << "Enter the name of the node being deleted" << endl;
@@ -259,8 +261,6 @@ void Graf<T>::DelNode()
 		{
 			V_int V;
 			temp.push_back(V);
-			for (int j = 0; j < Node - 1; j++)
-				temp[i].push_back(0);
 		}
 
 		for (int i = 0; i < Node; i++)
@@ -271,47 +271,18 @@ void Graf<T>::DelNode()
 
 		for (int i = 0; i < Node; i++)
 		{
-			if (Matrix[i][0] < 0)
-			{
-				Fstr = 0;
-			}
-			else
+			if (Matrix[i][0] > -1)
 			{
 				for (int j = 0; j < Node; j++)
-				{
-					if (Matrix[i][j] < 0)
-					{
-						Fstol = 0;
-					}
-					else
-					{
-						if (Fstol)
-						{
-							if (Fstr)
-							{
-								temp[i][j] = Matrix[i][j];
-							}
-							else
-							{
-								temp[i - 1][j] = Matrix[i][j];
-							}
-						}
+					if (Matrix[i][j] > -1)
+						if (Fstr)
+							temp[i].push_back(Matrix[i][j]);
 						else
-						{
-							if (Fstr)
-							{
-								temp[i][j - 1] = Matrix[i][j];
-							}
-							else
-							{
-								temp[i - 1][j - 1] = Matrix[i][j];
-							}
-						}
-					}
-				}
-
-				Fstol = 1;
+							temp[i - 1].push_back(Matrix[i][j]);
 			}
+			else
+				Fstr = 0;
+
 		}
 		Matrix.clear();
 	    Matrix = temp;
