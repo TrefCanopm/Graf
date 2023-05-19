@@ -1,12 +1,19 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <map>
+#include <cmath>
 
 using namespace std;
 
 typedef vector<vector<int>> V_V_int;
 typedef vector<int> V_int;
 typedef vector<string> V_str;
+
+typedef map<string, int> Map_int;
+typedef map<string, bool> Map_bool;
+typedef map<int, string> Map_str;
+typedef map<string, int> Map_str_int;
 
 V_str::iterator It_str;
 
@@ -28,13 +35,14 @@ public:
 
 	V_V_int CreateMatrix();
 
+	void AlgorithmDijkstra();
+	int MinAlgortmD(Map_bool, Map_int, Map_str, int);
 	~Graf();
 private:
 	V_V_int Matrix;
 	V_str Title;
 	int Node;
 	int Edge;
-
 };
 
 template<class T>
@@ -323,6 +331,131 @@ void Graf<T>::DelEdge()
 	}
 }
 
+template<class T>
+int Graf<T>::MinAlgortmD(Map_bool mb, Map_int mi, Map_str ms, int n)
+{
+	int K;
+	V_str temp;
+	string Min;
+	for (int i = 0; i < Node; i++)
+		if (Matrix[n][i] != 0)
+			temp.push_back(ms[i]);
+
+	K = temp.size();
+
+	int mn = 100000;
+
+	for (int i = 0; i < K; i++)
+	{
+		if (!mb[temp[i]])
+		{
+			if (mn > mi[temp[i]])
+			{
+				mn = mi[temp[i]];
+				Min = temp[i];
+			}
+		}
+	}
+
+	if (mn != 100000)
+		return ChekNode(Min);
+	else
+		return -1;
+}
+template<class T>
+void Graf<T>::AlgorithmDijkstra()
+{
+	string str1;
+	string str;
+	cout << "Enter the number of the element for which you want to run Dijkstra's algorithm" << endl;
+	getline(cin >> ws, str);
+	str1 = str;
+	int n = ChekNode(str);
+
+	int k = 0;
+	Map_bool Map_trav_node;
+	Map_int Map_min_val;
+	Map_str Map_node;
+	Map_str_int Map_Num_node;
+	for (int i = 0; i < Node; i++)
+	{
+		Map_min_val[Title[i]] = 100000;
+		Map_trav_node[Title[i]] = 0;
+		Map_node[i] = Title[i];
+		Map_Num_node[Title[i]] = i;
+	}
+
+	Map_min_val[str] = 0;
+
+	int K;
+	bool f = 1, F;
+	int nod = Node;
+	V_int travNode;
+
+	while ((nod > 0) && f)
+	{
+		V_str NodeT;
+		for (int i = 0; i < Node; i++)
+		{
+			if (Matrix[n][i] != 0)
+				NodeT.push_back(Map_node[i]);
+		}
+		K = NodeT.size();
+		for (int i = 0; i < K; i++)
+		{
+			if (Map_min_val[NodeT[i]] > Map_min_val[str] + Matrix[Map_Num_node[str]][Map_Num_node[NodeT[i]]])
+			{
+				Map_min_val[NodeT[i]] = Map_min_val[str] + Matrix[Map_Num_node[str]][Map_Num_node[NodeT[i]]];
+			};
+		}
+
+
+		K = MinAlgortmD(Map_trav_node, Map_min_val, Map_node, n);
+		if (K < 0)
+		{
+			Map_trav_node[str] = 1;
+			if (travNode[travNode.size() - 1] != Map_Num_node[str1])
+			{
+				n = travNode[travNode.size() - 1];
+				str = Title[n];
+				travNode.erase(travNode.end() - 1);
+				for (int i = 0; i < Node; i++)
+					F = Map_trav_node[Title[i]];
+				if (F)
+					nod--;
+				else
+					nod++;
+			}
+			else
+			{
+				f = 0;
+			}
+		}
+		else
+		{
+				travNode.push_back(Map_Num_node[str]);
+				Map_trav_node[str] = 1;
+				n = K;
+				str = Title[n];
+		}
+		NodeT.clear();
+	}
+	if (f)
+		for (int i = 0; i < Node; i++)
+		{
+			cout << "The shortest distance from element " << str1 << " to element " << Title[i] << " is " << Map_min_val[Title[i]] << endl;
+		}
+	else
+	{
+		for (int i = 0; i < Node; i++)
+		{
+			if(Map_min_val[Title[i]] != 100000)
+			cout << "The shortest distance from element " << str1 << " to element " << Title[i] << " is " << Map_min_val[Title[i]] << endl;
+		}
+		cout << "The minimum distance to the elements that the algorithm could calculate" << endl;
+	} 
+}
+
 void Menu()
 {
 	cout << "\tMenu" << endl;
@@ -331,7 +464,8 @@ void Menu()
 	cout << "3) Deleting a node" << endl;
 	cout << "4) Removing an edge" << endl;
 	cout << "5) Entering the adjacency matrix" << endl;
-	cout << "6) Finish working with the graph" << endl;
+	cout << "6) Dijkstra 's algorithm" << endl;
+	cout << "7) Finish working with the graph" << endl;
 }
 
 int main()
@@ -374,6 +508,11 @@ int main()
 			break;
 		}
 		case 6:
+		{
+			graf.AlgorithmDijkstra();
+			break;
+		}
+		case 7:
 		{
 			F = 0;
 			break;
