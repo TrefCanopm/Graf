@@ -36,6 +36,11 @@ public:
 	V_V_int CreateMatrix();
 
 	void AlgorithmDijkstra();
+
+	void DeepCrawl();
+
+	void BreadthTraversal();
+
 	int MinAlgortmD(Map_bool, Map_int, Map_str, int);
 	~Graf();
 private:
@@ -356,7 +361,7 @@ int Graf<T>::MinAlgortmD(Map_bool mb, Map_int mi, Map_str ms, int n)
 			}
 		}
 	}
-
+	temp.clear();
 	if (mn != 100000)
 		return ChekNode(Min);
 	else
@@ -454,6 +459,214 @@ void Graf<T>::AlgorithmDijkstra()
 		}
 		cout << "The minimum distance to the elements that the algorithm could calculate" << endl;
 	} 
+	Map_trav_node.clear();
+	Map_min_val.clear();
+	Map_node.clear();
+	Map_Num_node.clear();
+	travNode.clear();
+}
+
+template<class T>
+void Graf<T>::DeepCrawl()
+{
+	string str1;
+	string str;
+	cout << "Enter the element from which the crawl will begin" << endl;
+	getline(cin >> ws, str);
+	str1 = str;
+
+	Map_str NumTitl;
+	Map_str_int TitlNum;
+	Map_bool Passed_elements;
+
+	for (int i = 0; i < Node; i++)
+	{
+		NumTitl[i] = Title[i];
+		TitlNum[Title[i]] = i;
+		Passed_elements[Title[i]] = 0;
+	}
+
+	V_int Chain;
+	V_int Ways;
+
+	bool f = 1, fi = 1;
+	int nod = Node;
+
+	int K;
+	int k;
+	while ((nod > 0) && f)
+	{
+		for (int i = 0; i < Node; i++)
+			if (Matrix[TitlNum[str]][i] != 0)
+				Ways.push_back(i);
+
+		K = Ways.size();
+		k = 0;
+		if (!Passed_elements[str])
+		{	
+			nod--;
+			cout << str << "->";
+			Passed_elements[str] = 1;
+			while ((K > k) && fi)
+			{
+				if (!Passed_elements[NumTitl[Ways[k]]])
+				{
+					fi = 0;
+				}
+				else
+				{
+					k++;
+				}
+			}
+
+			if (!fi)
+			{
+				Chain.push_back(TitlNum[str]);
+				str = NumTitl[Ways[k]];	
+			
+			}
+			else
+			{
+				str = NumTitl[Chain[Chain.size() - 1]];
+				Chain.erase(Chain.end() - 1);
+				cout << endl;
+			}
+		}
+		else
+		{
+			cout << str << "->";
+			if (str == str1)
+			{
+				while ((K > k) && fi)
+				{
+					if (!Passed_elements[NumTitl[Ways[k]]])
+					{
+						fi = 0;
+					}
+					else
+						k++;
+				}
+				if (fi)
+				{
+					f = 0;
+				}
+				else
+				{
+					Chain.push_back(TitlNum[str]);
+					str = NumTitl[Ways[k]];
+				}
+			}
+			else
+			{
+				while ((K > k) && fi)
+				{
+					if (!Passed_elements[NumTitl[Ways[k]]])
+					{
+						fi = 0;
+					}
+					else					
+						k++;
+				}
+				if (!fi)
+				{
+					Chain.push_back(TitlNum[str]);
+					str = NumTitl[Ways[k]];
+				}
+				else
+				{
+					str = NumTitl[Chain[Chain.size() - 1]];
+					Chain.erase(Chain.end() - 1);
+				}
+			}
+		}
+		Ways.clear();
+		fi = 1;
+	}
+	NumTitl.clear();
+	TitlNum.clear();
+	Passed_elements.clear();
+	Chain.clear();
+	Ways.clear();
+}
+template<class T>
+void Graf<T>::BreadthTraversal()
+{
+	string str1;
+	string str;
+	cout << "Enter the element from which the crawl will begin" << endl;
+	getline(cin >> ws, str);
+	str1 = str;
+
+	Map_str NumTitl;
+	Map_str_int TitlNum;
+	Map_bool Passed_elements;
+
+	for (int i = 0; i < Node; i++)
+	{
+		NumTitl[i] = Title[i];
+		TitlNum[Title[i]] = i;
+		Passed_elements[Title[i]] = 0;
+	}
+
+	V_int Chain;
+	V_int Ways;
+
+	bool f = 1, fi = 1;
+	int nod = Node;
+
+	int K = 1, Kp = 0;
+	int k;
+
+	Chain.push_back(TitlNum[str]);
+	Passed_elements[str] = 1;
+
+	while (f)
+	{
+		if (K == Kp)
+		{
+			f = 0;
+		}
+		else
+		{
+			for (int i = Kp; i < K; i++)
+			{
+				str = NumTitl[Chain[i]];
+				cout << str << "->";
+				for (int i = 0; i < Node; i++)
+					if (Matrix[TitlNum[str]][i] != 0)
+						Ways.push_back(i);
+
+				for (int i = 0; i < Ways.size();i++)
+					if (!Passed_elements[NumTitl[Ways[i]]])
+					{
+						Passed_elements[NumTitl[Ways[i]]] = 1;
+						Chain.push_back(Ways[i]);
+					}
+			}
+			Kp = K;
+			K = Chain.size();
+			Ways.clear();
+		}
+	}
+	f = 1;
+	for (int i = 0; i < Node; i++)
+	{
+		if(!Passed_elements[Title[i]])
+			f = Passed_elements[Title[i]];
+	}
+	if (f)
+	{
+		cout << "The algorithm bypassed all the elements" << endl;
+	}
+	else
+	{
+		cout << "The algorithm did not bypass all the elements" << endl;
+	}
+	NumTitl.clear();
+	TitlNum.clear();
+	Passed_elements.clear();
+	Chain.clear();
+	Ways.clear();
 }
 
 void Menu()
@@ -464,8 +677,10 @@ void Menu()
 	cout << "3) Deleting a node" << endl;
 	cout << "4) Removing an edge" << endl;
 	cout << "5) Entering the adjacency matrix" << endl;
-	cout << "6) Dijkstra 's algorithm" << endl;
-	cout << "7) Finish working with the graph" << endl;
+	cout << "6) Dijkstra 's algorithm" << endl; 
+	cout << "7) Deep Crawl" << endl;
+	cout << "8) Bypass in width" << endl;
+	cout << "9) Finish working with the graph" << endl;
 }
 
 int main()
@@ -484,36 +699,59 @@ int main()
 		{
 		case 1:
 		{
+			system("cls");
 			graf.InsertNode();
+			system("cls");
 			break;
 		}
 		case 2:
 		{
+			system("cls");
 			graf.InsertEdge();
+			system("cls");
 			break;
 		}
 		case 3:
 		{
+			system("cls");
 			graf.DelNode();
+			system("cls");
 			break;
 		}
 		case 4:
 		{
+			system("cls");
 			graf.DelEdge();
+			system("cls");
 			break;
 		}
 		case 5:
 		{
+			system("cls");
 			graf.Print();
 			break;
 		}
 		case 6:
 		{
+			system("cls");
 			graf.AlgorithmDijkstra();
 			break;
 		}
 		case 7:
 		{
+			system("cls");
+			graf.DeepCrawl();
+			break;
+		}
+		case 8:
+		{
+			system("cls");
+			graf.BreadthTraversal();
+			break;
+		}
+		case 9:
+		{
+			system("cls");
 			F = 0;
 			break;
 		}
